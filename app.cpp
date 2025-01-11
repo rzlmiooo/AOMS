@@ -1,5 +1,3 @@
-// changelog : display() added parameter, finalizing menu no 4, 
-
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -9,8 +7,7 @@ using namespace std;
 const int control = 10, tpost = 5, fact = 4, whouse = 3, dorm = 3;
 int choice, choice2;
 
-
-// garis tabel
+// garis nggo nggawe tabel
 void Line (int length) {
 	for (int i = 0; i <= length; i++) {
 		cout <<	"-";
@@ -18,7 +15,7 @@ void Line (int length) {
 	cout << endl;
 }
 
-// data Operators
+// nyimpen data Operators
 struct Operators {
 	string name;
 	string skill;
@@ -30,7 +27,7 @@ struct Operators {
 } op[100];
 
 // nampilne tabel
-void display(struct Operators op[]) {
+void display() {
 	int j = 0;
 	cout << left << setw(5) << "No." << setw(20) << "Name" << setw(45) << "Skill" << setw(20) << "Position" << setw(10) << right << "Trust" << setw(10) << "Salary" << endl;
 	Line(120);
@@ -44,11 +41,11 @@ void display(struct Operators op[]) {
 	Line(120);
 }
 
-struct Queue {
+struct LinkedList {
 	Operators* head;
 	Operators* tail;
 
-	Queue() {
+	LinkedList() {
 		head = tail = NULL;
 	}
 
@@ -83,15 +80,6 @@ struct Queue {
 		delete temp;
 	}
 
-	// void queueIsFUll(Tree* root) {
-	// 	if (head == NULL) {
-	// 		cout << "No operators assigned!\n";
-	// 	} else {
-	// 		cout << "";
-	// 	}
-		
-	// }
-
 	void printQueue() {
 		Operators* temp = head;
 		while (temp != NULL) {
@@ -105,37 +93,19 @@ struct Queue {
 			temp = temp->next;
 		}
 	}
-
-	void printQueueTable() {
-		Operators* temp = head;
-		while (temp != NULL) {
-			cout << left << setw(5) << "No." << setw(20) << "Name" << setw(45) << "Skill" << setw(20) << "Position" << setw(10) << right << "Trust" << setw(10) << "Salary" << endl;
-			Line(120);
-			for (int i = 0; i < 20; i++) {
-				if (!temp->name.empty())
-				{
-					cout << left << setw(5) << i+1 << setw(20) << temp->name << setw(45) << temp->skill << setw(20) << temp->position << right << setw(9) << temp->trust << "%" << setw(5) << "$" << temp->salary << endl;
-					temp = temp->next;
-				}		
-			}
-			Line(120);
-			cin.ignore();
-			cin.get();
-		}
-	}
 };
 
 struct Tree {
 	string position;
 	Tree* children[5];
-	Queue* childQueue;
+	LinkedList* Queue;
 
 	Tree(string value) {
 		position = value;
 		for (int i = 0; i < 5; i++) {
 			children[i] = NULL;
 		}
-		childQueue = NULL;
+		Queue = NULL;
 	}
 };
 
@@ -151,99 +121,98 @@ void addChild(Tree* parent, int index, Tree* child) {
 	}
 }
 
-void addSubChild(Tree* parent, struct Operators op[], int choice) {
-    string pos;
-	if (parent->childQueue == NULL) {
-		parent->childQueue = new Queue();
-	}
-    Operators temp[10], q;
-	for (int i = 0; i < 10; i++) {
-    	pos = op[i].position;
-		if (choice == 0) {
-    	    if (pos == "Control Center") {
-    	        temp[i] = op[i];
-    		}
-    	}
-		if (choice == 1) {
-    	    if (pos == "Warehouse") {
-    	        temp[i] = op[i];
-    		}
-    	}
-		if (choice == 2) {
-    	    if (pos == "Trading Post") {
-    	        temp[i] = op[i];
-    		}
-    	}
-		if (choice == 3) {
-    	    if (pos == "Factory") {
-    	        temp[i] = op[i];
-    		}
-    	}
-		if (choice == 4) {
-    	    if (pos == "Dormitory") {
-    	        temp[i] = op[i];
-    		}
-    	}	
-	}
-    for (int i = 0; i < 10; i++) {
-        q = temp[i];
-	    parent->childQueue->enqueue(q);
-    }    
-}
-
 void assign(Tree* parent, struct Operators op[], int choice) {
+    int menu;
 	string pos;
-	if (parent->childQueue == NULL) {
-		parent->childQueue = new Queue();
+	cout << "Option :\n";
+	Line(120);
+	cout << "1. Assign an operator\n";
+	cout << "2. Drop an operator\n\n";
+	cout << "0. Back";
+	Line(120);
+	cout << "-> "; cin >> menu;
+	if (menu == 0)
+	{
+		return;
 	}
-    Operators temp[10], q;
-	for (int i = 0; i < 10; i++) {
-    	pos = op[i].position;
-		if (choice == 0) {
-    	    if (pos == "Control Center") {
-    	        temp[i] = op[i];
-    		}
+	
+	if (menu == 1)
+	{
+    	if (parent->Queue == NULL) {
+    	    parent->Queue = new LinkedList();
     	}
-		if (choice == 1) {
-    	    if (pos == "Warehouse") {
-    	        temp[i] = op[i];
-    		}
+    	Operators temp[10];
+    	int tempIndex = 0; 
+    	for (int i = 0; i < 10; i++) {
+    	    pos = op[i].position;
+    	    if ((choice == 0 && pos == "Control Center") ||
+    	        (choice == 1 && pos == "Warehouse") ||
+    	        (choice == 2 && pos == "Trading Post") ||
+    	        (choice == 3 && pos == "Factory") ||
+    	        (choice == 4 && pos == "Dormitory")) 
+    	    {
+    	        temp[tempIndex++] = op[i]; // Simpan data ke array `temp`
+    	    }
     	}
-		if (choice == 2) {
-    	    if (pos == "Trading Post") {
-    	        temp[i] = op[i];
-    		}
+    	cout << "\nAvailable Operators :\n";
+		int j = 0;
+		cout << left << setw(5) << "No." << setw(20) << "Name" << setw(45) << "Skill" << setw(20) << "Position" << setw(10) << right << "Trust" << setw(10) << "Salary" << endl;
+		Line(120);
+		for (int i = 0; i < tempIndex; i++) {
+			if (!temp[i].name.empty())
+			{
+				j++;
+				cout << left << setw(5) << j << setw(20) << temp[i].name << setw(45) << temp[i].skill << setw(20) << temp[i].position << right << setw(9) << temp[i].trust << "%" << setw(5) << "$" << temp[i].salary << endl;
+			}		
+		}
+		Line(120);
+    	cout << "Choose -> ";
+    	cin >> choice2;
+    	if (choice2 < 0 || choice2 > tempIndex) {
+    	    cout << "Invalid choice!\n";
+    	    return;
     	}
-		if (choice == 3) {
-    	    if (pos == "Factory") {
-    	        temp[i] = op[i];
-    		}
+    	parent->Queue->enqueue(temp[choice2-1]);
+		cout << "Operator ";
+		parent->Queue->printQueue();
+		cout << " assigned.";
+		for (int i = 0; i < tempIndex; i++) {
+    	    if (op[i].name == temp[choice2-1].name) {
+    	        op[i].name = "";
+    	        op[i].position = "";
+    	        op[i].skill = "";
+    	        op[i].trust = 0;
+    	        op[i].salary = 0;
+    	        break;
+    	    }
     	}
-		if (choice == 4) {
-    	    if (pos == "Dormitory") {
-    	        temp[i] = op[i];
-    		}
-    	}	
 	}
-	display(temp);
-	cout << "Choose -> "; cin >> choice2;
-    q = temp[choice2];
-	parent->childQueue->enqueue(q);
+	if (menu == 2)
+	{
+		if (parent->Queue == NULL) {
+    	    return;
+    	}
+		cout << "Operator "; 
+		parent->Queue->printQueue();
+		cout << " dropped.";
+		parent->Queue->dequeue();	
+	}
+	cin.ignore();
+	cin.get();
 }
-
 
 void printTree(Tree* root) {
-    if (root->childQueue == NULL) {
-        cout << "\n\tWARNING! No operator assigned at " << root->position << ", Please assign an operator.\n";
+    if (root->Queue == NULL) {
+        cout << "\n\tNo operator assigned at " << root->position << ", Please assign an operator.\n";
     }
-    if (root->childQueue != NULL) {
-        root->childQueue->printQueue();
+    if (root->Queue != NULL) {
+        root->Queue->printQueue();
         cout << endl;
     }
 }
 
-void printBaseIsEmpty(Tree* root) {
-	if (root->childQueue == NULL) {
+void printIsEmpty(Tree* root) {
+	if (root->Queue == NULL) {
 		cout << "There are problem in " << root->position << ".\n";
 	}
 }
@@ -268,6 +237,11 @@ void sortName(struct Operators op[]) {
 			}
 		}
 	}
+	cout << "Operators Inforamation - Sort by Name\n\n";
+	display();
+	cout << "Press any key to back...";
+	cin.ignore();
+	cin.get();
 }
 
 void sortSkill(struct Operators op[]) {
@@ -289,6 +263,11 @@ void sortSkill(struct Operators op[]) {
 			}
 		}
 	}
+	cout << "Operators Information - Sort by Skill\n\n";
+	display();
+	cout << "Press any key to back...";
+	cin.ignore();
+	cin.get();
 }
 
 void sortPos(struct Operators op[]) {
@@ -310,6 +289,11 @@ void sortPos(struct Operators op[]) {
 			}
 		}
 	}
+	cout << "Operators Information - Sort by Position\n\n";
+	display();
+	cout << "Press any key to back...";
+	cin.ignore();
+	cin.get();
 }
 
 void sortTrust(struct Operators op[]) {
@@ -331,6 +315,11 @@ void sortTrust(struct Operators op[]) {
 			}
 		}
 	}
+	cout << "Operators Information - Sort by Trust\n\n";
+	display();
+	cout << "Press any key to back...";
+	cin.ignore();
+	cin.get();
 }
 
 void sortSalary(struct Operators op[]) {
@@ -352,6 +341,11 @@ void sortSalary(struct Operators op[]) {
             }
         }
     }
+	cout << "Operators Information - Sort by Salary\n\n";
+	display();
+	cout << "Press any key to back...";
+	cin.ignore();
+	cin.get();
 }
 
 
@@ -360,7 +354,8 @@ void search(struct Operators op[]) {
 	string temp;
 
 	string search;
-	cout << "Enter word to Search: ";
+	cout << "Operator Search\n\n";
+	cout << "Enter operator name : ";
 	cin >> search;
 
 	for (char &c : search)
@@ -386,6 +381,9 @@ void search(struct Operators op[]) {
 			found = true;
 		}
 	}
+	cout << "Press any key to back...";
+	cin.ignore();
+	cin.get();
 
 	if (!found)
 	{
@@ -457,9 +455,18 @@ void recruit(struct Operators op[]) {
             break;
 		}
 	}
+	cout << "Operators Successfully Added.\n\n";
+	display();
+	cout << "Press any key to back...";
+	cin.ignore();
+	cin.get();
 }
 
-void erase(struct Operators op[], int choice) {
+void erase(struct Operators op[]) {
+	int choice;
+	cout << "Which operator you want to delete?\n\n";
+	display();
+	cout << "-> "; cin >> choice;
 	for (int i = 0; i < 20; i++)
 	{
 		if (op[i+1].name.empty())
@@ -471,6 +478,9 @@ void erase(struct Operators op[], int choice) {
 			break;
 		}
 	}
+	cout << "Press any key to back...";
+	cin.ignore();
+	cin.get();
 }
 
 
@@ -551,12 +561,6 @@ int main()
 	Tree* tradingPost = root->children[2];
 	Tree* factory = root->children[3];
 	Tree* dormitory = root->children[4];
-
-    // addSubChild(controlCenter, op, 0);
-	// addSubChild(warehouse, op, 1);
-	// addSubChild(tradingPost, op, 2);
-	// addSubChild(factory, op, 3);
-	// addSubChild(dormitory, op, 4);
     
 	// main menu
 	while (true) {
@@ -580,15 +584,14 @@ int main()
 		if (choice == 1)
 		{
 			system("cls");
-			Line(100);
-			cout << "\nBase Overview\n\n";
-    		Line(100);
-			printBaseIsEmpty(controlCenter);
-			printBaseIsEmpty(warehouse);
-			printBaseIsEmpty(tradingPost);
-			printBaseIsEmpty(factory);
-			printBaseIsEmpty(dormitory);
-
+			cout << "+-------------------------------------------+\n";
+			cout << "|                  Base Overview            |\n";
+			cout << "+-------------------------------------------+\n";
+			printIsEmpty(controlCenter);
+			printIsEmpty(warehouse);
+			printIsEmpty(tradingPost);
+			printIsEmpty(factory);
+			printIsEmpty(dormitory);
    			cout << "a. Control Center\n";
 			cout << "	Controlling all buildings\n";
 			cout << "   	Operator currently assigned : "; printTree(controlCenter);
@@ -632,38 +635,48 @@ int main()
 				cout << "-> "; cin >> choice;
 				if (choice == 1)
 				{
-					cout << "Currently assigned operators : "; printTree(controlCenter);
+					cout << "+-------------------------------------------+\n";
+            		cout << "|                  Control Center           |\n";
+            		cout << "+-------------------------------------------+\n";
+					cout << "Assigned operator : ";
+					printTree(controlCenter);
 					assign(controlCenter, op, 0); 
-					cin.ignore();
-					cin.get();
 				}
 				if (choice == 2)
 				{
-					cout << "Currently assigned operators : "; printTree(warehouse);
+					cout << "+-------------------------------------------+\n";
+            		cout << "|                    Warehouse              |\n";
+            		cout << "+-------------------------------------------+\n";
+					cout << "Assigned operator : ";
+					printTree(warehouse);
 					assign(warehouse, op, 1);
-					cin.ignore();
-					cin.get();
 				}
 				if (choice == 3)
 				{
-					cout << "Currently assigned operators : "; printTree(tradingPost);
+					cout << "+-------------------------------------------+\n";
+            		cout << "|                   Trading Post            |\n";
+            		cout << "+-------------------------------------------+\n";
+					cout << "Assigned operator : ";
+					printTree(tradingPost);
 					assign(tradingPost, op, 2);
-					cin.ignore();
-					cin.get();
 				}
 				if (choice == 4)
 				{
-					cout << "Currently assigned operators : "; printTree(factory);
+					cout << "+-------------------------------------------+\n";
+            		cout << "|                      Factory              |\n";
+            		cout << "+-------------------------------------------+\n";
+					cout << "Assigned operator : ";
+					printTree(factory);
 					assign(factory, op, 3);
-					cin.ignore();
-					cin.get();
 				}
 				if (choice == 5)
 				{
-					cout << "Currently assigned operators : "; printTree(dormitory);
-					assign(dormitory, op, 4);
-					cin.ignore();
-					cin.get();	
+					cout << "+-------------------------------------------+\n";
+            		cout << "|                   Dormitory               |\n";
+            		cout << "+-------------------------------------------+\n";
+					cout << "Assigned operator : ";
+					printTree(dormitory);
+					assign(dormitory, op, 4);	
 				}
 			}
 		}
@@ -672,7 +685,6 @@ int main()
 			cout << "- Products -\n\n";
 			cout << "tabel";
 		}
-		
 		if (choice == 4) {
 			while(choice != 0) {
 				system("cls");
@@ -695,75 +707,34 @@ int main()
 				if (choice == 1)
 				{
 					sortName(op);
-					cout << "Operators Inforamation - Sort by Name\n\n";
-					display(op);
-					cout << "Press any key to back...";
-					cin.ignore();
-					cin.get();
 				}
 				if (choice == 2)
 				{
 					sortSkill(op);
-					cout << "Operators Information - Sort by Skill\n\n";
-					display(op);
-					cout << "Press any key to back...";
-					cin.ignore();
-					cin.get();
 				}
-
 				if (choice == 3)
 				{
 					sortPos(op);
-					cout << "Operators Information - Sort by Position\n\n";
-					display(op);
-					cout << "Press any key to back...";
-					cin.ignore();
-					cin.get();
 				}
 				if (choice == 4)
 				{
 					sortTrust(op);
-					cout << "Operators Information - Sort by Trust\n\n";
-					display(op);
-					cout << "Press any key to back...";
-					cin.ignore();
-					cin.get();
 				}
 				if (choice == 5)
 				{
 					sortSalary(op);
-					cout << "Operators Information - Sort by Salary\n\n";
-					display(op);
-					cout << "Press any key to back...";
-					cin.ignore();
-					cin.get();
 				}
 				if (choice == 6)
 				{
-					cout << "Operator Search\n\n";
 					search(op);
-					cout << "Press any key to back...";
-					cin.ignore();
-					cin.get();
 				}
 				if (choice == 7)
 				{
 					recruit(op);
-					cout << "Operators Overview - Sort by Name\n\n";
-					display(op);
-					cout << "Press any key to back...";
-					cin.ignore();
-					cin.get();
 				}
 				if (choice == 8)
 				{
-					cout << "Which operator you want to delete?\n\n";
-					display(op);
-					cout << "-> "; cin >> choice;
-					erase(op, choice);
-					cout << "Press any key to back...";
-					cin.ignore();
-					cin.get();
+					erase(op);
 				}				
 			}
 		}
@@ -772,4 +743,5 @@ int main()
 			cout << "Invalid input.";
 		}
 	}
+	return 0;
 }
