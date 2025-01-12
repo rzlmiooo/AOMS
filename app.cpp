@@ -262,6 +262,12 @@ void printTree(Tree* root) {
     }
 }
 
+void printIsEmpty(Tree* root) {
+	if (root->Queue == NULL) {
+		cout << "There are problem in " << root->position << ".\n";
+	}
+}
+
 Products *top, *bottom;
 
 void stack(struct Products s) {
@@ -324,40 +330,44 @@ void production() {
 	int menu;
 	Products temp;
 	Line(80);
-	// system("cls");
-	cout << "Production Stack\n";
-	printStack();
-	Line(80);
-	cout << "Option :\n";
-	cout << "1. Sell product.\n";
-	cout << "2. Add new product.\n\n";
-	cout << "0. Back\n";
-	Line(80);
-	cout << "-> "; cin >> menu;
-	if (menu == 0)
-	{
-		return;
-	}
-	if (menu == 1) {
-		cout << top->name << " sold.\n";
-		pop();
+	while (true) {
+		system("cls");
+		cout << "Production Stack\n";
+		Line(80);
 		printStack();
-	}
-	if (menu == 2)
-	{
-		cout << "Product name : "; getline(cin, temp.name);
-		cout << "Qty          : "; cin >> temp.qty;
-		cout << "Price        : $"; cin >> temp.price;
-		push(temp);
-		printStack();
-	}
-	cin.ignore();
-	cin.get();
-}
-
-void printIsEmpty(Tree* root) {
-	if (root->Queue == NULL) {
-		cout << "There are problem in " << root->position << ".\n";
+		Line(80);
+		cout << "Option :\n";
+		cout << "1. Sell product.\n";
+		cout << "2. Add new product.\n\n";
+		cout << "0. Back\n";
+		Line(80);
+		cout << "-> "; cin >> menu;
+		if (menu == 0)
+		{
+			return;
+		}
+		if (menu == 1) {
+			if (top == NULL)
+			{
+				cout << "There nothing to do.\n";
+				return;
+			}
+			cout << "\n" << top->name << " sold.\n";
+			pop();
+			printStack();
+		}
+		if (menu == 2)
+		{
+			cin.ignore();
+			cout << "Product name : "; getline(cin, temp.name);
+			cout << "Qty          : "; cin >> temp.qty;
+			cout << "Price        : $"; cin >> temp.price;
+			push(temp);
+			printStack();
+		}
+		cout << "\nPress any key...";
+		cin.ignore();
+		cin.get();
 	}
 }
 
@@ -747,11 +757,11 @@ int main()
 	}
 
 	while (true) {
-		// system("cls");
+		system("cls");
 		Line(50);
 		cout << "AOMS\n";
-		cout << "Arknights Operator Management System\n";
 		Line(50);
+		cout << "Arknights Operator Management System\n";
 		cout << "Main Menu\n";
 		cout << "1. Base Overview\n";
 		cout << "2. Operators Assignment\n";
@@ -767,7 +777,7 @@ int main()
 		} 
 		if (choice == 1)
 		{
-			// system("cls");
+			system("cls");
 			cout << "+-------------------------------------------+\n";
 			cout << "|                  Base Overview            |\n";
 			cout << "+-------------------------------------------+\n";
@@ -805,11 +815,11 @@ int main()
 			dua:
 			while (choice != 0)
 			{
-				// system("cls");
+				system("cls");
 				cout << "- Operator Assignment -\n\n";
 				cout << "Option :\n";
-				Line(50);
 				cout << "1. Control Center\n";
+				Line(50);
 				cout << "2. Warehouse\n";
 				cout << "3. Trading Post\n";
 				cout << "4. Factory\n";
@@ -870,11 +880,11 @@ int main()
 		}
 		if (choice == 4) {
 			while(choice != 0) {
-				// system("cls");
+				system("cls");
 				Line(80);
 				cout << "\n- Operators Information -\n\n";
-				Line(80);
 				cout << "Option :\n";
+				Line(80);
 				cout << "1. Sort by Name\n";
 				cout << "2. Sort by Skill\n";
 				cout << "3. Sort by Position\n";
