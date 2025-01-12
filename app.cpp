@@ -7,7 +7,25 @@ using namespace std;
 const int control = 10, tpost = 5, fact = 4, whouse = 3, dorm = 3;
 int choice, choice2;
 
-// garis nggo nggawe tabel
+struct Operators {
+	string name;
+	string skill;
+	string position;
+	double trust;
+	double salary;
+	bool assigned = false;
+
+	Operators *prev, *next;
+} op[100];
+
+struct Products {
+	string name;
+	int qty;
+	double price;
+
+	Products *prev, *next;
+} p[5];
+
 void Line (int length) {
 	for (int i = 0; i <= length; i++) {
 		cout <<	"-";
@@ -15,27 +33,29 @@ void Line (int length) {
 	cout << endl;
 }
 
-// nyimpen data Operators
-struct Operators {
-	string name;
-	string skill;
-	string position;
-	double trust;
-	double salary;
-
-	Operators *prev, *next;
-} op[100];
-
-// nampilne tabel
 void display() {
 	int j = 0;
-	cout << left << setw(5) << "No." << setw(20) << "Name" << setw(45) << "Skill" << setw(20) << "Position" << setw(10) << right << "Trust" << setw(10) << "Salary" << endl;
+	cout << left
+	 	 << setw(5) << "No." 
+		 << setw(20) << "Name" 
+		 << setw(45) << "Skill" 
+		 << setw(20) << "Position" 
+		 << setw(10) << right << "Trust" 
+		 << setw(10) << "Salary" 
+		 << endl;
 	Line(120);
 	for (int i = 0; i < 20; i++) {
 		if (!op[i].name.empty())
 		{
 			j++;
-			cout << left << setw(5) << j << setw(20) << op[i].name << setw(45) << op[i].skill << setw(20) << op[i].position << right << setw(9) << op[i].trust << "%" << setw(5) << "$" << op[i].salary << endl;
+			cout << left
+			 	 << setw(5) << j 
+				 << setw(20) << op[i].name 
+				 << setw(45) << op[i].skill 
+				 << setw(20) << op[i].position 
+				 << right << setw(9) << op[i].trust << "%" 
+				 << setw(5) << "$" << op[i].salary 
+				 << endl;
 		}		
 	}
 	Line(120);
@@ -45,8 +65,11 @@ struct LinkedList {
 	Operators* head;
 	Operators* tail;
 
+	Products* top;
+
 	LinkedList() {
 		head = tail = NULL;
+		top = NULL;
 	}
 
 	void enqueue(struct Operators q) {
@@ -61,11 +84,15 @@ struct LinkedList {
         newNode->trust = q.trust;
         newNode->salary = q.salary;
 
-		newNode->next = head;
-        if (head != NULL) {
-            head->prev = newNode;
+		newNode->next = NULL;
+        if (tail != NULL) {
+            tail->next = newNode;
+			newNode->prev = tail;
         }
-        head = newNode;
+        tail = newNode;
+		if (head == NULL) {
+			head = newNode;
+		}
 	}
 
 	void dequeue() {
@@ -81,13 +108,17 @@ struct LinkedList {
 	}
 
 	void printQueue() {
+		if (head == NULL)
+		{
+			cout << "No operator assigned.\n";
+			return;
+		}
 		Operators* temp = head;
 		while (temp != NULL) {
-			if (temp->next != NULL)
-			{
+			if (temp->next != NULL) {
 				cout << temp->name << ", ";
-			} else
-			{
+			} 
+			else {
 				cout << temp->name;
 			}
 			temp = temp->next;
@@ -95,17 +126,29 @@ struct LinkedList {
 	}
 };
 
+
 struct Tree {
 	string position;
 	Tree* children[5];
 	LinkedList* Queue;
+	LinkedList* Stack;
 
 	Tree(string value) {
 		position = value;
 		for (int i = 0; i < 5; i++) {
 			children[i] = NULL;
 		}
-		Queue = NULL;
+		Queue = new LinkedList();
+		Stack = new LinkedList();
+	}
+
+	~Tree() {
+		delete Queue;
+		delete Stack;
+		for (int i = 0; i < 5; i++)
+		{
+			delete children[i];
+		}
 	}
 };
 
@@ -124,6 +167,7 @@ void addChild(Tree* parent, int index, Tree* child) {
 void assign(Tree* parent, struct Operators op[], int choice) {
     int menu;
 	string pos;
+
 	cout << "Option :\n";
 	Line(120);
 	cout << "1. Assign an operator\n";
@@ -131,11 +175,11 @@ void assign(Tree* parent, struct Operators op[], int choice) {
 	cout << "0. Back";
 	Line(120);
 	cout << "-> "; cin >> menu;
+	
 	if (menu == 0)
 	{
 		return;
 	}
-	
 	if (menu == 1)
 	{
     	if (parent->Queue == NULL) {
@@ -151,18 +195,29 @@ void assign(Tree* parent, struct Operators op[], int choice) {
     	        (choice == 3 && pos == "Factory") ||
     	        (choice == 4 && pos == "Dormitory")) 
     	    {
-    	        temp[tempIndex++] = op[i]; // Simpan data ke array `temp`
+    	        temp[tempIndex++] = op[i];
     	    }
     	}
     	cout << "\nAvailable Operators :\n";
 		int j = 0;
-		cout << left << setw(5) << "No." << setw(20) << "Name" << setw(45) << "Skill" << setw(20) << "Position" << setw(10) << right << "Trust" << setw(10) << "Salary" << endl;
+		cout << left << setw(5) << "No." 
+			 << setw(20) << "Name" 
+			 << setw(45) << "Skill" 
+			 << setw(20) << "Position" 
+			 << setw(10) << right << "Trust" 
+			 << setw(10) << "Salary" 
+			 << endl;
 		Line(120);
 		for (int i = 0; i < tempIndex; i++) {
-			if (!temp[i].name.empty())
+			if (!temp[i].name.empty() && temp[i].assigned == false)
 			{
 				j++;
-				cout << left << setw(5) << j << setw(20) << temp[i].name << setw(45) << temp[i].skill << setw(20) << temp[i].position << right << setw(9) << temp[i].trust << "%" << setw(5) << "$" << temp[i].salary << endl;
+				cout << left << setw(5) << j 
+				<< setw(20) << temp[i].name 
+				<< setw(45) << temp[i].skill 
+				<< setw(20) << temp[i].position 
+				<< right << setw(9) << temp[i].trust << "%" 
+				<< setw(5) << "$" << temp[i].salary << endl;
 			}		
 		}
 		Line(120);
@@ -176,21 +231,17 @@ void assign(Tree* parent, struct Operators op[], int choice) {
 		cout << "Operator ";
 		parent->Queue->printQueue();
 		cout << " assigned.";
-		for (int i = 0; i < tempIndex; i++) {
+		for (int i = 0; i < 20; i++) {
     	    if (op[i].name == temp[choice2-1].name) {
-    	        op[i].name = "";
-    	        op[i].position = "";
-    	        op[i].skill = "";
-    	        op[i].trust = 0;
-    	        op[i].salary = 0;
-    	        break;
+    	        op[i].assigned = true;
     	    }
     	}
 	}
 	if (menu == 2)
 	{
 		if (parent->Queue == NULL) {
-    	    return;
+    	    cout << parent->position << " kosong.";
+			return;
     	}
 		cout << "Operator "; 
 		parent->Queue->printQueue();
@@ -211,13 +262,105 @@ void printTree(Tree* root) {
     }
 }
 
+Products *top, *bottom;
+
+void stack(struct Products s) {
+	top = new Products();
+	top->name = s.name;
+	top->qty = s.qty;
+	top->price = s.price;
+	top->next = NULL;
+	bottom = top;
+}
+
+void push(struct Products s) {
+    if (top == NULL) {
+        stack(s);
+		return;
+    }
+	Products* newNode = new Products();
+    newNode->name = s.name;
+    newNode->qty = s.qty;
+	newNode->price = s.price;
+	newNode->next = top;
+    top = newNode;
+}
+
+void pop() {
+	if (top == NULL) {
+		cout << "Inventory empty.\n";
+		return;
+	}
+	Products* temp = top;
+	top = top->next;
+	delete temp;
+}
+
+void printStack() {
+	if (top == NULL)
+	{
+		cout << "Inventory empty.\n";
+		return;
+	}
+	Products* temp = top;
+	int j = 0;
+	cout << left << setw(5) << "No." 
+		 << setw(20) << "Name"  
+		 << setw(10) << right << "Qty" 
+		 << setw(10) << "Price" 
+		 << endl;
+	Line(80);
+	while (temp != NULL) {
+		j++;
+		cout << left << setw(5) << j 
+		<< setw(20) << temp->name 
+		<< right << setw(9) << temp->qty 
+		<< setw(5) << "$" << temp->price << endl;
+		temp = temp->next;
+	}
+}
+
+void production() {
+	int menu;
+	Products temp;
+	Line(80);
+	// system("cls");
+	cout << "Production Stack\n";
+	printStack();
+	Line(80);
+	cout << "Option :\n";
+	cout << "1. Sell product.\n";
+	cout << "2. Add new product.\n\n";
+	cout << "0. Back\n";
+	Line(80);
+	cout << "-> "; cin >> menu;
+	if (menu == 0)
+	{
+		return;
+	}
+	if (menu == 1) {
+		cout << top->name << " sold.\n";
+		pop();
+		printStack();
+	}
+	if (menu == 2)
+	{
+		cout << "Product name : "; getline(cin, temp.name);
+		cout << "Qty          : "; cin >> temp.qty;
+		cout << "Price        : $"; cin >> temp.price;
+		push(temp);
+		printStack();
+	}
+	cin.ignore();
+	cin.get();
+}
+
 void printIsEmpty(Tree* root) {
 	if (root->Queue == NULL) {
 		cout << "There are problem in " << root->position << ".\n";
 	}
 }
 
-// linear sort
 void sortName(struct Operators op[]) {
     int size = 20;
 	Operators temp;
@@ -258,7 +401,7 @@ void sortSkill(struct Operators op[]) {
 			if (op[j].skill > op[j+1].skill)
 			{
 				temp = op[j];
-				op[j] = op[j+1];
+				op[j] = op[j+1];	
 				op[j+1] = temp;
 			}
 		}
@@ -368,16 +511,31 @@ void search(struct Operators op[]) {
 
 	for (int i = 0; i <= size; i++)
 	{
-		string temp = op[i].name;
+		temp = op[i].name;
 		for (char &c : temp)
 		{
 			c = tolower(c); 
 		}
 		if (temp == search)
 		{
-			cout << left << setw(5) << "No." << setw(20) << "Name" << setw(45) << "Skill" << setw(20) << "Position" << setw(10) << right << "Trust" << setw(10) << "Salary" << endl;
+			cout << left 
+				 << setw(5) << "No." 
+				 << setw(20) << "Name" 
+				 << setw(45) << "Skill" 
+				 << setw(20) << "Position" 
+				 << setw(10) << right << "Trust" 
+				 << setw(10) << "Salary" 
+				 << endl;
 			Line(120);
-			cout << left << setw(5) << i+1 << setw(20) << op[i].name << setw(45) << op[i].skill << setw(20) << op[i].position << right << setw(9) << op[i].trust << "%" << setw(5) << "$" << op[i].salary << endl;	
+			cout << left 
+				 << setw(5) << i+1 
+				 << setw(20) << op[i].name 
+				 << setw(45) << op[i].skill 
+				 << setw(20) << op[i].position 
+				 << right 
+				 << setw(9) << op[i].trust << "%" 
+				 << setw(5) << "$" << op[i].salary 
+				 << endl;	
 			found = true;
 		}
 	}
@@ -486,7 +644,6 @@ void erase(struct Operators op[]) {
 
 int main()
 {
-	// operator database
 	op[0].name = "Amiya";
 	op[0].skill = "Boost all operators stamina";
 	op[0].position = "Control Center";
@@ -547,7 +704,26 @@ int main()
 	op[9].trust = 50;
 	op[9].salary = fact * op[9].trust;
 
-	// tree start
+	p[0].name = "Manganese Ore";
+	p[0].qty = 10;
+	p[0].price = 150;
+
+	p[1].name = "Gold Bar";
+	p[1].qty = 3;
+	p[1].price = 450;
+
+	p[2].name = "Loxic Kohl";
+	p[2].qty = 0;
+	p[2].price = 100;
+
+	p[3].name = "Grindstone";
+	p[3].qty = 10;
+	p[3].price = 120;
+
+	p[4].name = "Originium Shard";
+	p[4].qty = 15;
+	p[4].price = 400;
+
 	Tree* root = createNode("AOMS");
 
     addChild(root, 0, createNode("Control Center"));
@@ -562,9 +738,16 @@ int main()
 	Tree* factory = root->children[3];
 	Tree* dormitory = root->children[4];
     
-	// main menu
+	for (int i = 0; i < 5; i++)
+	{
+		if (!p[i].name.empty())
+		{
+			push(p[i]);
+		}
+	}
+
 	while (true) {
-		system("cls");
+		// system("cls");
 		Line(50);
 		cout << "AOMS\n";
 		cout << "Arknights Operator Management System\n";
@@ -577,13 +760,14 @@ int main()
 		cout << "\n0. Exit\n";
 		Line(50);
 		cout << "-> "; cin >> choice;
+
 		if (choice == 0) {
 			cout << "Closing AOMS...\n";
 			return 0;
 		} 
 		if (choice == 1)
 		{
-			system("cls");
+			// system("cls");
 			cout << "+-------------------------------------------+\n";
 			cout << "|                  Base Overview            |\n";
 			cout << "+-------------------------------------------+\n";
@@ -621,7 +805,7 @@ int main()
 			dua:
 			while (choice != 0)
 			{
-				system("cls");
+				// system("cls");
 				cout << "- Operator Assignment -\n\n";
 				cout << "Option :\n";
 				Line(50);
@@ -682,12 +866,11 @@ int main()
 		}
 		if (choice == 3)
 		{
-			cout << "- Products -\n\n";
-			cout << "tabel";
+			production();
 		}
 		if (choice == 4) {
 			while(choice != 0) {
-				system("cls");
+				// system("cls");
 				Line(80);
 				cout << "\n- Operators Information -\n\n";
 				Line(80);
